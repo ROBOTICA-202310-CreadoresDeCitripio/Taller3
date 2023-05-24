@@ -1,0 +1,28 @@
+[1.718s] Invoking command in '/home/robotica/Robotica/Taller 3/src/mi_robot_manipulador_15': PYTHONPATH=/home/robotica/Robotica/Taller 3/build/mi_robot_manipulador_15/prefix_override:/home/robotica/Robotica/Taller 3/install/mi_robot_manipulador_15/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/mi_robot_manipulador_15 build --build-base /home/robotica/Robotica/Taller 3/build/mi_robot_manipulador_15/build install --record /home/robotica/Robotica/Taller 3/build/mi_robot_manipulador_15/install.log --single-version-externally-managed
+[2.227s] running egg_info
+[2.251s] writing ../../build/mi_robot_manipulador_15/mi_robot_manipulador_15.egg-info/PKG-INFO
+[2.261s] writing dependency_links to ../../build/mi_robot_manipulador_15/mi_robot_manipulador_15.egg-info/dependency_links.txt
+[2.273s] writing entry points to ../../build/mi_robot_manipulador_15/mi_robot_manipulador_15.egg-info/entry_points.txt
+[2.286s] writing requirements to ../../build/mi_robot_manipulador_15/mi_robot_manipulador_15.egg-info/requires.txt
+[2.300s] writing top-level names to ../../build/mi_robot_manipulador_15/mi_robot_manipulador_15.egg-info/top_level.txt
+[2.347s] reading manifest file '../../build/mi_robot_manipulador_15/mi_robot_manipulador_15.egg-info/SOURCES.txt'
+[2.362s] writing manifest file '../../build/mi_robot_manipulador_15/mi_robot_manipulador_15.egg-info/SOURCES.txt'
+[2.372s] running build
+[2.374s] running build_py
+[2.381s] copying mi_robot_manipulador_15/robot_manipulator_teleop.py -> /home/robotica/Robotica/Taller 3/build/mi_robot_manipulador_15/build/lib/mi_robot_manipulador_15
+[2.406s] running install
+[2.408s] /usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+[2.410s] running install_lib
+[2.412s]   warnings.warn(
+[2.450s] copying /home/robotica/Robotica/Taller 3/build/mi_robot_manipulador_15/build/lib/mi_robot_manipulador_15/robot_manipulator_teleop.py -> /home/robotica/Robotica/Taller 3/install/mi_robot_manipulador_15/lib/python3.10/site-packages/mi_robot_manipulador_15
+[2.481s] byte-compiling /home/robotica/Robotica/Taller 3/install/mi_robot_manipulador_15/lib/python3.10/site-packages/mi_robot_manipulador_15/robot_manipulator_teleop.py to robot_manipulator_teleop.cpython-310.pyc
+[2.507s] running install_data
+[2.514s] running install_egg_info
+[2.520s] removing '/home/robotica/Robotica/Taller 3/install/mi_robot_manipulador_15/lib/python3.10/site-packages/mi_robot_manipulador_15-0.0.0-py3.10.egg-info' (and everything under it)
+[2.556s] Copying ../../build/mi_robot_manipulador_15/mi_robot_manipulador_15.egg-info to /home/robotica/Robotica/Taller 3/install/mi_robot_manipulador_15/lib/python3.10/site-packages/mi_robot_manipulador_15-0.0.0-py3.10.egg-info
+[2.751s] running install_scripts
+[2.797s] Installing robot_manipulator_interface script to /home/robotica/Robotica/Taller 3/install/mi_robot_manipulador_15/lib/mi_robot_manipulador_15
+[2.814s] Installing robot_manipulator_planner script to /home/robotica/Robotica/Taller 3/install/mi_robot_manipulador_15/lib/mi_robot_manipulador_15
+[2.843s] Installing robot_manipulator_teleop script to /home/robotica/Robotica/Taller 3/install/mi_robot_manipulador_15/lib/mi_robot_manipulador_15
+[2.859s] writing list of installed files to '/home/robotica/Robotica/Taller 3/build/mi_robot_manipulador_15/install.log'
+[2.954s] Invoked command in '/home/robotica/Robotica/Taller 3/src/mi_robot_manipulador_15' returned '0': PYTHONPATH=/home/robotica/Robotica/Taller 3/build/mi_robot_manipulador_15/prefix_override:/home/robotica/Robotica/Taller 3/install/mi_robot_manipulador_15/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/mi_robot_manipulador_15 build --build-base /home/robotica/Robotica/Taller 3/build/mi_robot_manipulador_15/build install --record /home/robotica/Robotica/Taller 3/build/mi_robot_manipulador_15/install.log --single-version-externally-managed
