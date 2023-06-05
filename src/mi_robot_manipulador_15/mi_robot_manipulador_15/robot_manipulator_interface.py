@@ -1,70 +1,154 @@
-import pygame
-from pygame.locals import *
-from OpenGL.GL import *
-from OpenGL.GLU import *
-
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Vector3
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import tkinter as tk
+import math
+
+class InitialMenu():
+    # ==================================================================================================
+    # Constructor del menú inicial de la aplicación
+    # ==================================================================================================
+    def __init__(self, message_1, message_2, option_1, option_2, option_3):
+        self.window = tk.Tk()
+        self.window.title("Turtlebot Application Start Menu")
+        self.window.resizable(True, False)
+
+        # Crear los mensajes que se mostrarán en los botones
+        self.label_1 = tk.Label(self.window, text=message_1)
+        self.label_1.pack(pady=5)
+        self.label_2 = tk.Label(self.window, text=message_2)
+        self.label_2.pack(pady=5)
+
+        # Crear los botones que se incorporarán en la ventana
+        self.button_1 = tk.Button(
+            self.window, text=option_1, command=self.select_draw_trajectory)
+        self.button_1.pack(side=tk.LEFT, padx=10)
+        self.button_2 = tk.Button(
+            self.window, text=option_2, command=self.select_save_trajectory)
+        self.button_2.pack(side=tk.LEFT, padx=10)
+        self.button_3 = tk.Button(
+            self.window, text=option_3, command=self.select_play_trajectory)
+        self.button_3.pack(side=tk.LEFT, padx=10)
+
+    # ==================================================================================================
+    # Definir los métodos de la clase -> Event Listeners de hacer click a algún botón
+    # ==================================================================================================
+    def select_draw_trajectory(self):
+        # Primera opción: Dibujar la trayectoria seguida por el robot
+        self.window.destroy()
+        # Inicializar la GUI específica para Dibujo de Trayectoria
+        rclpy.init(args=None)
+        turtle_bot_interface = TurtleBotInterface()
+        rclpy.spin(turtle_bot_interface)
+
+        # Arrancar la GUI de Tkinter
+        turtle_bot_interface.root.mainloop()
+
+        turtle_bot_interface.destroy_node()
+        rclpy.shutdown()
+
+    def select_save_trajectory(self):
+        # Segunda opción: Guardar la trayectoria seguida por el robot
+        self.window.destroy()
+        # Inicializar la GUI específica para Guardado de Trayectoria
+        rclpy.init(args=None)
+        turtle_bot_interface = TurtleBotInterface()
+        rclpy.spin(turtle_bot_interface)
+
+        # Arrancar la GUI de Tkinter
+        turtle_bot_interface.root.mainloop()
+
+        turtle_bot_interface.destroy_node()
+        rclpy.shutdown()
+
+    def select_play_trajectory(self):
+        # Tercera opción: Reporoducir la trayectoria seguida por el robot
+        self.window.destroy()
+        # Inicializar la GUI específica para Reproducción de Trayectoria
+        rclpy.init(args=None)
+        turtle_bot_interface = TurtleBotInterface()
+        rclpy.spin(turtle_bot_interface)
+
+        # Arrancar la GUI de Tkinter
+        turtle_bot_interface.root.mainloop()
+
+        turtle_bot_interface.destroy_node()
+        rclpy.shutdown()
+
+    def run(self):
+        # Correr la ventana con el menú inicial
+        self.window.mainloop()
 
 
-class RobotManipulatorInterface(Node):
+class TurtleBotInterface(Node):
     def __init__(self):
-        super().__init__('robot_manipulator_interface')
+        super().__init__("robot_interface")
+        self.subscription = self.create_subscription(Vector3, "robot_manipulator_position", self.callback, 10)
+        self.subscription
 
-        # Subscribe to ROS2 topic "robot_manipulator_position"
-        self.subscription = self.create_subscription(
-            Vector3,
-            'robot_manipulator_position',
-            self.position_callback,
-            10
-        )
+        # Crear ventana principal de Tkinter
+        self.root = tk.Tk()
+        self.root.title("Robot Interface")
 
-        # Initialize position values
-        self.x = 0.0
-        self.y = 0.0
-        self.z = 0.0
+        # Crear figura de Matplotlib
+        self.fig, self.ax = plt.subplots()
+        self.ax.set_xlim(-3, 3)
+        self.ax.set_ylim(-3, 3)
+        self.xdata = [0.0]
+        self.ydata = [0.0]
+        self.theta = 0.0
+        self.line, = self.ax.plot(self.xdata, self.ydata)
 
-        # Initialize Pygame
-        pygame.init()
-        self.width, self.height = 800, 600
-        pygame.display.set_mode((self.width, self.height), DOUBLEBUF | OPENGL)
+        # Crea un botón que llame a la función save_figure cuando se haga clic en él
+        save_button = tk.Button(self.root, text="Guardar", command=self.save_figure)
+        save_button.pack(side=tk.BOTTOM)
 
-        # Run the main loop
-        self.main_loop()
+        # Crea un cuadro de texto que actualiza el titulo de la gráfica
+        self.text_field = tk.Text(self.root, height=1, width=40, wrap="word")
+        self.text_field.pack()
 
-    def position_callback(self, msg):
-        # Update position values
-        self.x = msg.x
-        self.y = msg.y
-        self.z = msg.z
+        # Crea un botón que actualiza el titulo de la gráfica
+        title_button = tk.Button(self.root, text="Cambiar título", command=self.cambiar_titulo)
+        title_button.pack()
 
-    def main_loop(self):
-        while True:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    shutdown()
-                    return
+        # Crear un widget de Matplotlib que se puede agregar a la ventana principal de Tkinter
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.root)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
 
-            # Clear the screen
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-            glLoadIdentity()
+    def actualizar_titulo(self, new_title):
+        self.fig_title = new_title
+        self.ax.set_title(new_title)
 
-            # Set up the perspective projection
-            gluPerspective(45, (self.width / self.height), 0.1, 50.0)
-            glTranslatef(0.0, 0.0, -5)
+    def cambiar_titulo(self):
+        new_title = self.text_field.get('1.0','end')
+        self.actualizar_titulo(new_title)
 
-            # Draw the end-effector position
-            glBegin(GL_POINTS)
-            glColor3f(1.0, 0.0, 0.0)
-            glVertex3f(self.x, self.y, self.z)
-            glEnd()
+    def save_figure(self):
+        # Pídele al usuario que seleccione un archivo
+        file_path = tk.filedialog.asksaveasfilename(defaultextension=".png")
+        # Guarda la figura de Matplotlib en el archivo seleccionado
+        if file_path:
+            self.fig.savefig(file_path)
 
-            pygame.display.flip()
-            pygame.time.wait(10)
+    def callback(self, msg):
+        x = 0.01*msg.x
+        self.theta += math.pi*msg.z/180
+        self.xdata.append(self.xdata[-1] + x * math.cos(self.theta))
+        self.ydata.append(self.ydata[-1] + x * math.sin(self.theta))
+        self.line.set_data(self.xdata, self.ydata)
+        plt.draw()
+        plt.pause(0.01)
+        plt.show(block=False)
 
+
+def main(args=None):
+    # Diálogo para funcionamiento inicial
+    dialog = InitialMenu("¡Bienvenid@ a la aplicación del TurtleBot 15!", "Seleccione una opción:",
+                         "DIBUJAR TRAYECTORIA", "GUARDAR TRAYECTORIA", "REPRODUCIR TRAYECTORIA")
+    dialog.run()
 
 if __name__ == '__main__':
-    init()
-    robot_interface = RobotManipulatorInterface()
+    main()

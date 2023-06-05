@@ -13,9 +13,8 @@ class ManipuladorTeleop(Node):
         self.antebrazo = float(input("Por favor ingrese la velocidad del antebrazo (en deg/s - max600): "))
         self.brazo = float(input("Por favor ingrese la velocidad del brazo (en deg/s - max600): "))
         self.base = float(input("Por favor ingrese la velocidad de la base (en deg/s - max600): "))
-        # Publicar en el tópico manipulator_cmdVel el mensaje tipo Twist
-        self.publisher_ = self.create_publisher(Vector3,'manipulator_cmdVel', 10)
-        self.position_publisher_ = self.create_publisher(Vector3,'robot_manipulator_position', 10)
+        # Publicar en el tópico manipulator_position el mensaje tipo Vector3
+        self.publisher_ = self.create_publisher(Vector3,'robot_manipulator_position', 10)
         # Definir el Listener de la librería pynput para que detecte tecleo
         with Listener(on_press=self.callback_pressed, on_release=self.callback_released) as listener:
             listener.join()
@@ -27,7 +26,7 @@ class ManipuladorTeleop(Node):
     def callback_pressed(self, key):
         # Actualización de velocidades cuando se oprime una tecla
         vel_msg = Vector3()
-        pos_msg = Vector3()
+        print(vel_msg)
         # Movimiento horario del antebrazo - Rotacional hacia adelante
         if key.char == "a":
             vel_msg.x = self.antebrazo
