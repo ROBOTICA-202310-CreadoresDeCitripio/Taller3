@@ -20,7 +20,7 @@ int value1, value2, value3;
 char recibido[20];
 
 void setup(){ 
-  Serial.begin(9600);
+  Serial.begin(240000);
 
   servo1.attach(pinservo1, 660, 2600); // Servo del joint #1 asociado al pin PWM5
   servo2.attach(pinservo2, 660, 2600); // Servo del joint #2 asociado al pin PWM6
@@ -31,6 +31,7 @@ void setup(){
   pinMode(pinservo2, OUTPUT);
   pinMode(pinservo3, OUTPUT);
   pinMode(pinservo4, OUTPUT);
+
 }
  
 void loop(){
@@ -64,34 +65,8 @@ void loop(){
       token = strtok(NULL, ",");
     }
 
-    if (value1 = 1.0 && value2 == 1.0 && value3 == 1.0) 
-    {
-      pinza(0, 180);
-    }
-    else if (value1 > 0.0 && value2 == 0.0 && value3 == 0.0) 
-    {
-      antebrazo_antihorario(value1);
-    }
-    else if (value1 < 0.0 && value2 == 0.0 && value3 == 0.0) 
-    {
-      antebrazo_horario(abs(value1));
-    }
-    else if (value1 == 0.0 && value2 > 0.0 && value3 == 0.0) 
-    {
-      brazo_antihorario(value2);
-    }
-    else if (value1 == 0.0 && value2 < 0.0 && value3 == 0.0) 
-    {
-      brazo_horario(abs(value2));
-    }
-    else if (value1 == 0.0 && value2 == 0.0 && value3 > 0.0) 
-    {
-      base_antihorario(value3);
-    }
-    else if (value1 == 0.0 && value2 == 0.0 && value3 < 0.0) 
-    {
-      base_horario(abs(value3));
-    }
+    mover_desesperado(value1, value2, value3);
+
   }
 }
 
@@ -174,4 +149,51 @@ void base_horario(int velocidad){
     float d = (60/(0.06*velocidad)) - 5/3;
     delay(d);
   }
+}
+
+void mover_desesperado(int final2, int final3, int final4){
+  int j;
+  int inicio2 = pos2;
+  int inicio3 = pos3;
+  int inicio4 = pos4;
+
+  if (inicio2 < final2){
+    for (j=inicio2; j<final2; j++){
+      servo2.write(j);
+      delay(20);
+    }
+  }
+  else{
+    for (j=inicio2; j>final2; j--){
+      servo2.write(j);
+      delay(20);
+    }
+  }
+
+  if (inicio3 < final3){
+    for (j=inicio3; j<final3; j++){
+      servo3.write(j);
+      delay(20);
+    }
+  }
+  else{
+    for (j=inicio3; j>final3; j--){
+      servo3.write(j);
+      delay(20);
+    }
+  }
+
+  if (inicio4 < final4){
+    for (j=inicio4; j<final4; j++){
+      servo4.write(j);
+      delay(20);
+    }
+  }
+  else{
+    for (j=inicio4; j>final4; j--){
+      servo4.write(j);
+      delay(20);
+    }
+  }
+
 }

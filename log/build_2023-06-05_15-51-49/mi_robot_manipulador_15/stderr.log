@@ -1,0 +1,3 @@
+/usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+  warnings.warn(
+error: [Errno 26] Text file busy: '/home/robotica/Robotica/Taller 3/install/mi_robot_manipulador_15/lib/python3.10/site-packages/mi_robot_manipulador_15/__pycache__/robot_manipulator_planner.cpython-310.pyc.139772080325328' -> '/home/robotica/Robotica/Taller 3/install/mi_robot_manipulador_15/lib/python3.10/site-packages/mi_robot_manipulador_15/__pycache__/robot_manipulator_planner.cpython-310.pyc'

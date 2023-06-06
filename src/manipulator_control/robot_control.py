@@ -1,7 +1,8 @@
 import rclpy
 from rclpy.node import Node
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Vector3
 import serial,time
+import serial.tools.list_ports
 
 
 class RobotController(Node):
@@ -9,12 +10,14 @@ class RobotController(Node):
     def __init__(self):
         super().__init__('robot_controller')
         # Open serial connection to Arduino
-        self.ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+        ports = list(serial.tools.list_ports.comports())
+        arduino_port = ports[0].device
+        self.arduino = serial.Serial(port=arduino_port, baudrate=9600, timeout=0.1)
         # Wait for Arduino to reset
         time.sleep(2)
 
         self.subscription = self.create_subscription(
-            Twist,
+            Vector3,
             'manipulator_cmdVel',
             self.listener_callback,
             10)

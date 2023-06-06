@@ -1,105 +1,84 @@
+from pynput.keyboard import Key, Listener
+
 import rclpy
-import time
 from rclpy.node import Node
-from std_msgs.msg import String
 from geometry_msgs.msg import Vector3
-from pynput import keyboard
-import threading
-from math import pi, atan2, sqrt
 import math
-import numpy as np
+from std_msgs.msg import Float64MultiArray
 
 class RobotManipulatorPlanner(Node):
-    def _init_(self):
-        super()._init_('robot_manipulator_planner')
-        self.publisher_vel = self.create_publisher(Vector3, '/robot_manipulator_goal', 10)
-        timer_period = 0.1
-        # Definir dimensiones del robot 
-        self.dimension1 = 10.5  # dimensión 1 (cm)
-        self.dimension2 = 10.5  # dimensión 2 (cm)
-        self.dimension3 = 10.5    # dimensión 3 (cm)
-        # Se pregunta al usuario que valores desea ingresar
-        while True:
-            try:
-                self.iniciox = 0.0
-                self.inicioy = 0.0
-                self.inicioz = 0.0
-                self.coordinate_x = float(input("Ingrese la coordenada x que desea de la posición del end-effector: "))
-                self.coordinate_y = float(input("Ingrese la coordenada y que desea de la posición del end-effector: "))
-                self.coordinate_z = float(input("Ingrese la coordenada z que desea de la posición del end-effector: "))
-                break
-            except ValueError:
-                print("Entrada inválida. Por favor ingrese un número.")
-        
-        self.inverseKinematics()
-       
-        self.velocity = {'iniciox': 0.0, 'inicioy': 0.0, 'inicioz': 0.0}
+    def __init__(self):
+        super().__init__('robot_manipulator_planner')
 
-    def inverseKinematics(self):
-        # Matrices de transformación homogénea
-        T = np.array([
-            [1, 0, 0, self.coordinate_x],
-            [0, 1, 0, self.coordinate_y],
-            [0, 0, 1, self.coordinate_z - self.dimension3],
-            [0, 0, 0, 1]
-        ])
+        self.antebrazo = float(input("Por favor ingrese la posición final en x: "))
+        self.brazo = float(input("Por favor ingrese la posición final en y: "))
+        self.base = float(input("Por favor ingrese la posición final en z: "))
+        self.publisher_ = self.create_publisher(Vector3, 'robot_manipulator_goal', 10)
+        with Listener(on_press=self.callback_pressed, on_release=self.callback_released) as listener:
+            listener.join()
+        # Inicializar el Listener dentro del constructor de la clase
+        listener.start()
 
-        T0_1 = np.array([
-            [np.cos(self.iniciox), -np.sin(self.iniciox), 0, 0],
-            [np.sin(self.iniciox), np.cos(self.iniciox), 0, 0],
-            [0, 0, 1, 0],
-            [0, 0, 0, 1]
-        ])
+    def callback_pressed(self, key):
+        # Actualización de velocidades cuando se oprime una tecla
+        msg = Vector3()
+        print(msg)
+        # Movimiento horario del antebrazo - Rotacional hacia adelante
 
-        T1_2 = np.array([
-            [np.cos(self.inicioy), -np.sin(self.inicioy), 0, self.dimension1],
-            [0, 0, -1, 0],
-            [np.sin(self.inicioy), np.cos(self.inicioy), 0, 0],
-            [0, 0, 0, 1]
-        ])
+        x = self.antebrazo / 100.0
+        y = self.brazo / 100.0
+        z = self.base / 100.0
 
-        T2_3 = np.array([
-            [np.cos(self.inicioz), -np.sin(self.inicioz), 0, self.dimension2],
-            [np.sin(self.inicioz), np.cos(self.inicioz), 0, 0],
-            [0, 0, 1, 0],
-            [0, 0, 0, 1]
-        ])
+        # Perform inverse kinematics calculations to determine joint angles
+        # Replace the calculations below with your own inverse kinematics implementation
+        if x >= 0:
+            angle1 = 180.0
+        else:
+            angle1 = 0.0
 
-        T0_3 = np.dot(np.dot(T0_1, T1_2), T2_3)
+        # Calculate angle2 using the Pythagorean theorem
+        hypotenuse_length = 10.7
+        opposite_length = y
+        angle2 = math.degrees(math.acos(opposite_length / hypotenuse_length))
+        # Limit angle2 between 0 and 180 degrees
+        angle2 = max(0.0, min(angle2, 180.0))
 
-        # Cálculo de los ángulos de la cinemática inversa
-        theta1 = atan2(T0_3[1, 3], T0_3[0, 3])
-        theta2 = atan2(sqrt(T0_3[0, 3]*2 + T0_3[1, 3]*2) - self.dimension1, T0_3[2, 3])
-        theta3 = atan2(T0_3[2, 2], -T0_3[2, 0])
+        height = z
+        angle3 = math.degrees(math.asin(height / hypotenuse_length))
+        angle3 = max(0.0, min(angle3, 180.0))
 
-        # Convertir ángulos a valores entre -pi y pi
-        theta1 = theta1 % (2 * pi)
-        if theta1 > pi:
-            theta1 -= 2 * pi
+        # Publish the joint angles
+        if key.char == "v":
+            msg.x = angle1
+            msg.y = angle2
+            msg.z = angle3
+            self.publisher_.publish(msg)
 
-        theta2 = theta2 % (2 * pi)
-        if theta2 > pi:
-            theta2 -= 2 * pi
+    def callback_released(self, key):
+        # Actualización a cero de las velocidades cuando se suelta una tecla
+        vel_msg = Vector3()
+        vel_msg.x = 0.0
+        vel_msg.y = 0.0
+        vel_msg.z = 0.0
+        self.publisher_.publish(vel_msg)
+        self.get_logger().info('No hay teclas presionadas. El manipulador se está deteniendo.')
+        if key == Key.esc:
+            # Stop listener when ESC is pressed
+            return False
 
-        theta3 = theta3 % (2 * pi)
-        if theta3 > pi:
-            theta3 -= 2 * pi
+# =============== MÉTODO MAIN PARA EJECUCIÓN ===============
+def main(args=None):
+    rclpy.init(args=args)
 
-        gRot = math.degrees(theta1)
-        gj1 = math.degrees(theta2)
-        gj2 = math.degrees(theta3)
+    manipulador_teleop = RobotManipulatorPlanner()
 
-        message = Vector3()
-        message.x = gRot
-        message.y = gj1
-        message.z = gj2
-        self.publisher_vel.publish(message)
+    rclpy.spin(manipulador_teleop)
 
-def main():
-    rclpy.init()
-    node = RobotManipulatorPlanner()
-    rclpy.spin(node)
+    # Destroy the node explicitly
+    # (optional - otherwise it will be done automatically
+    # when the garbage collector destroys the node object)
+    manipulador_teleop.destroy_node()
     rclpy.shutdown()
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     main()
